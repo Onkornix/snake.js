@@ -1,2 +1,2 @@
 # snake.js
-snake in natice javascript
+basic snake in native javascript
