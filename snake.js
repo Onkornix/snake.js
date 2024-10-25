@@ -5,41 +5,53 @@ ctx.canvas.width = 900
 const deathSound = new Audio()
 deathSound.src = "resources/deathsound.mp3"
 
-let body = [[30,30],[60,30]]
+let body = [[]]
 
-let currentDirection = "right"
-let dirChangeQueue = []
+let currentDirection
+let dirChangeQueue
 
-let apple = false
-let applePos = [-30,-30]
+let apple
+let applePos
 
-let size = 1
+let score
+
+function start() {
+    
+    body = [[30,30],[60,30]]
+
+    currentDirection = "right"
+    dirChangeQueue = []
+    
+    apple = false
+    applePos = [-30,-30]
+    
+    score = 0
+    console.log("start")
+    draw()
+    setInterval(frame, options.intervalRate)
+}
+
 
 
 function draw() {
-    ctx.clearRect(0,0,900,900)
-
+    ctx.clearRect(0,0,900,900) 
     let y = 0
     let x = 0
-    let done = false
-    let groundColors = ["#161717", "#272929"]
+    let groundColors = options.groundColors
     let groundIndex = 0
 
-    while (done == false) {
-        for (y; y <= 900; y += 30) {
-            for (x; x <= 900; x += 30) {
-                ctx.fillStyle = groundColors[groundIndex % 2]
-                ctx.fillRect(x, y, 30, 30)
-                groundIndex++
-            }
-            x = 0
+    for (y; y <= 900; y += 30) {
+        for (x; x <= 900; x += 30) {
+            ctx.fillStyle = groundColors[groundIndex % 2]
+            ctx.fillRect(x, y, 30, 30)
+            groundIndex++
         }
-        done = true
+        x = 0
     }
 
     let currentBodyPart = 0
 
-    let snakeColors = ["#469e4c", "#4aaa51"]
+    let snakeColors = options.snakeColors
     let colorIndex = 0
 
     while (currentBodyPart <= body.length - 1 ) {
@@ -55,7 +67,7 @@ function draw() {
 
     ctx.fillStyle = "white"
     ctx.font = "bold 46px Impact";
-    ctx.fillText(size,450,60)
+    ctx.fillText(score,450,60)
 }
 function elongate() {
     let end = body.length - 1
@@ -85,7 +97,7 @@ function elongate() {
         body.push(bodycopy[i])
     }
 
-    size++
+    score++
 
 }
 function move() {
@@ -93,6 +105,7 @@ function move() {
     let newPart
     let i = body.length - 1
     let bodyCopy = body
+
     if (dirChangeQueue.length >= 1) {
         let reqChange = dirChangeQueue.shift()
         if (reqChange != currentDirection) {
@@ -162,7 +175,6 @@ function collision() {
 
     for (let i = 0; i < b.length - 1; i++) {
         if (b[i][0] == headPos[0] && b[i][1] == headPos[1]) {
-                console.log(true)
                 return true
             }
     }
@@ -184,6 +196,8 @@ function end() {
       ],
       2000)
       deathMessage.style = "opacity: 1"
+
+      
 }
 
 function frame(){
@@ -206,7 +220,7 @@ function frame(){
     move()
 
     if (collision() == true) {
-        clearInterval(interval)
+        clearInterval()
         end()
         return
     }
@@ -217,7 +231,7 @@ function frame(){
 
 window.addEventListener("keypress", (e) => {
     switch (e.key) {
-        case "s":
+        case "s" || "ArrowDown":
             if (currentDirection == "up") {
                 break;
             }
@@ -241,11 +255,13 @@ window.addEventListener("keypress", (e) => {
             }
             dirChangeQueue.push("right")
             break;
+        case "Enter": 
+            start()
+            break;
         default:
+            console.log(e.key)
             break;
     }
 
 })
 
-draw()
-const interval = setInterval(frame, 100)

@@ -4,10 +4,39 @@
     </head>
     <body>
         <canvas id="awesomeCanvas">
-            
         </canvas>
         <div id="you-died-fade">
             <img src="resources/youdied.png">
+        </div>
+        <div class="options">
+            <p id="speed">
+                speed
+                <input type="range" name="snakeSpeed" id="snakeSpeed" min="0" max="190">
+            </p>
+            <p id="keys">
+                keybinds
+            </p>
+            <p class="snakeColors">
+                snake colors
+                <input type="color" name="snakeColor1" id="snakeColor1">
+                <input type="color" name="snakeColor2" id="snakeColor2">
+            </p>
+            <p class="groundColors">
+                ground colors
+                <input type="color" name="groundColor1" id="groundColor1">
+                <input type="color" name="groundColor2" id="groundColor2">
+            </p>
+            <p id="maxApple">
+                max apples
+                <input type="range" name="maxApples" id="maxApples" min="1" max="10">
+            </p>
+            <p id="startingSnakeSize">
+                starting snake Size
+                <input type="range" name="startingSnakeSize" id="startingSnakeSize" min="1" max="10">
+            </p>
+            <p>
+                <input type="button" name="submitOptions" id="submitOptions" value="Update">
+            </p>
         </div>
         <style>
             #awesomeCanvas {
@@ -23,14 +52,25 @@
                 position: absolute; 
                 top: 50%; 
                 left: 50%; 
-                transform: translate(-50%, -50%)
+                transform: translate(-50%, -50%);
             }
             body {
                 background-color: black;
             }
+            .options {
+                font-size: 20px;
+                background-color: white;
+                position: absolute;
+                width: 300px;
+
+
+                display: grid;
+                grid-template-columns: 1fr;
+
+            }
         
         </style>
-        <script type="text/javascript" src="./snake2.js">
-        </script>
+        <script type="text/javascript" src="./options.js"></script>
+        <script type="text/javascript" src="./snake.js"></script>
     </body>
 </html>
