@@ -4,18 +4,37 @@ ctx.canvas.width = 900
 
 const deathSound = new Audio()
 deathSound.src = "resources/deathsound.mp3"
+const deathMessage =  document.getElementById("you-died-fade");
 
 let body = [[]]
 
-let currentDirection
+let currentDirection 
 let dirChangeQueue
 
 let apple
 let applePos
 
+let alive = false
 let score
 
+let intervalID = 0
+
+function theFunctionINeededThatPutsEverythingBackToNormalSoThatThePlayerCanStartANewGame() {
+    body = [[30,30],[60,30]]
+
+    currentDirection = "right"
+    dirChangeQueue = []
+    
+    apple = false
+    applePos = [-30,-30]
+
+    alive = false
+    
+    score = 0
+    deathMessage.style = "opacity: 0"
+}
 function start() {
+    theFunctionINeededThatPutsEverythingBackToNormalSoThatThePlayerCanStartANewGame()
     
     body = [[30,30],[60,30]]
 
@@ -24,20 +43,19 @@ function start() {
     
     apple = false
     applePos = [-30,-30]
+    alive = true
     
     score = 0
     console.log("start")
+
     draw()
-    setInterval(frame, options.intervalRate)
+    intervalID = setInterval(frame, 100)
 }
-
-
-
 function draw() {
     ctx.clearRect(0,0,900,900) 
     let y = 0
     let x = 0
-    let groundColors = options.groundColors
+    let groundColors = ["#161717", "#272929"]
     let groundIndex = 0
 
     for (y; y <= 900; y += 30) {
@@ -51,11 +69,11 @@ function draw() {
 
     let currentBodyPart = 0
 
-    let snakeColors = options.snakeColors
+    let snakeColors = ["#469e4c", "#4aaa51", "#4eb555", "#4aaa51"]
     let colorIndex = 0
 
     while (currentBodyPart <= body.length - 1 ) {
-        ctx.fillStyle = snakeColors[colorIndex % 2]
+        ctx.fillStyle = snakeColors[colorIndex % 4]
         ctx.fillRect(body[currentBodyPart][0],body[currentBodyPart][1],30,30)
 
         currentBodyPart += 1
@@ -146,12 +164,13 @@ function spawnApple() {
     let appleX = Math.round((Math.random() * (29 - 1) + 1)) * 30;
     let appleY = Math.round((Math.random() * (29 - 1) + 1)) * 30;
 
-
     apple = true
     applePos = [appleX, appleY]
 
-    if (applePos in body) {
-        spawnApple()
+    for (let i = 0; i <= body.length - 1; i++) {
+        if (applePos[0] == body[i][0] && applePos[1] == body[i][1]) {
+            spawnApple()
+        }
     }
 
 }
@@ -184,7 +203,7 @@ function collision() {
 }
 function end() {
 
-    const deathMessage =  document.getElementById("you-died-fade");
+
     deathSound.play()
     deathMessage.animate([
         {
@@ -196,10 +215,7 @@ function end() {
       ],
       2000)
       deathMessage.style = "opacity: 1"
-
-      
 }
-
 function frame(){
 
     
@@ -216,19 +232,18 @@ function frame(){
 
     }
     
-
+    
     move()
 
     if (collision() == true) {
-        clearInterval()
+        alive = false
+        clearInterval(intervalID)
         end()
         return
     }
 
     draw()
 }
-
-
 window.addEventListener("keypress", (e) => {
     switch (e.key) {
         case "s" || "ArrowDown":
@@ -256,7 +271,11 @@ window.addEventListener("keypress", (e) => {
             dirChangeQueue.push("right")
             break;
         case "Enter": 
-            start()
+            if (alive == true) {
+                break
+            } else {
+                start()
+            }
             break;
         default:
             console.log(e.key)
