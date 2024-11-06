@@ -19,6 +19,8 @@ let score
 
 let intervalID = 0
 
+let obstacles = [[]]
+
 function theFunctionINeededThatPutsEverythingBackToNormalSoThatThePlayerCanStartANewGame() {
     body = [[30,30],[60,30]]
 
@@ -32,6 +34,8 @@ function theFunctionINeededThatPutsEverythingBackToNormalSoThatThePlayerCanStart
     
     score = 0
     deathMessage.style = "opacity: 0"
+
+    obstacles = [[]]
 }
 function start() {
     theFunctionINeededThatPutsEverythingBackToNormalSoThatThePlayerCanStartANewGame()
@@ -82,6 +86,11 @@ function draw() {
 
     ctx.fillStyle = "#ab3434"
     ctx.fillRect(applePos[0],applePos[1],30,30)
+
+    ctx.fillStyle = "#ceced0"
+    for (i in obstacles) {
+        ctx.fillRect(obstacles[i][0],obstacles[i][1],30,30)
+    }
 
     ctx.fillStyle = "white"
     ctx.font = "bold 46px Impact";
@@ -167,8 +176,13 @@ function spawnApple() {
     apple = true
     applePos = [appleX, appleY]
 
-    for (let i = 0; i <= body.length - 1; i++) {
-        if (applePos[0] == body[i][0] && applePos[1] == body[i][1]) {
+    for (i in body) {
+        if (listsAreEqual(applePos, body[i])) {
+            spawnApple()
+        }
+    }
+    for (i in obstacles) {
+        if (listsAreEqual(applePos, obstacles[i])) {
             spawnApple()
         }
     }
@@ -193,13 +207,56 @@ function collision() {
 
 
     for (let i = 0; i < b.length - 1; i++) {
-        if (b[i][0] == headPos[0] && b[i][1] == headPos[1]) {
+        if (listsAreEqual(b[i], headPos)) {
                 return true
             }
+    }
+    
+    for (i in obstacles) {
+        if (listsAreEqual(headPos, obstacles[i])) {
+            return true
+        }
     }
 
     return false
 
+}
+function spawnObstacle() {
+    //console.log("attempting")
+    let obstacle = [
+        Math.round((Math.random() * (29 - 1) + 1)) * 30,
+        Math.round((Math.random() * (29 - 1) + 1)) * 30
+    ]
+
+    let nonSpawnableBlocks = [[]]
+
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            nonSpawnableBlocks.push([body[0][0]+(i*30)],body[0][1]+(j*30))
+        }
+        console.log(body[i])
+        console.log(nonSpawnableBlocks)
+    }
+
+    for (i in body) {
+        nonSpawnableBlocks.push(body[i])
+    }
+
+    for (i in obstacles) {
+        nonSpawnableBlocks.push(obstacles[i])
+    }
+
+    nonSpawnableBlocks.push(applePos)
+
+    for (i in nonSpawnableBlocks) {
+        if (listsAreEqual(nonSpawnableBlocks[i], obstacle) == true) {
+            console.log("failed spawn")
+            return false
+        }
+    }
+
+    obstacles.push(obstacle)
+    //console.log(noSpawnZone)
 }
 function end() {
 
@@ -218,22 +275,32 @@ function end() {
 }
 function frame(){
 
-    
     if (apple == false) {
         spawnApple()
     }
 
     let headPos1 = body[body.length - 1]
 
-    if (headPos1[0] == applePos[0] && headPos1[1] == applePos[1]) {
+    if (listsAreEqual(headPos1, applePos)) {
         elongate()
         apple = false
         applePos = [-30,-30]
 
+        if (score != 0 && score % 3 == 0) {
+            for (let i = 0; i <= 10; i++) {
+                let success = false
+                while (success == false) {
+                    success = spawnObstacle()
+                }
+            }
+        }
+
     }
     
+    if (alive == true) {
+        move()
+    }
     
-    move()
 
     if (collision() == true) {
         alive = false
@@ -244,9 +311,17 @@ function frame(){
 
     draw()
 }
-window.addEventListener("keypress", (e) => {
-    switch (e.key) {
-        case "s" || "ArrowDown":
+
+function listsAreEqual(list1, list2) {
+    if (list1[0] == list2[0] && list1[1] == list2[1]) {
+        return true
+    } else {
+        return false
+    }
+}
+window.addEventListener("keydown", (e) => {
+    switch (e.key.toLowerCase()) {
+        case "s":
             if (currentDirection == "up") {
                 break;
             }
@@ -270,7 +345,31 @@ window.addEventListener("keypress", (e) => {
             }
             dirChangeQueue.push("right")
             break;
-        case "Enter": 
+        case "arrowdown":
+            if (currentDirection == "up") {
+                break;
+            }
+            dirChangeQueue.push("down")
+            break;
+        case "arrowup":
+            if (currentDirection == "down") {
+                break;
+            }
+            dirChangeQueue.push("up")
+            break;
+        case "arrowleft":
+            if (currentDirection == "right") {
+                break;
+            }
+            dirChangeQueue.push("left")
+            break;
+        case "arrowright":
+            if (currentDirection == "left") {
+                break;
+            }
+            dirChangeQueue.push("right")
+            break;
+        case "enter": 
             if (alive == true) {
                 break
             } else {
@@ -278,7 +377,7 @@ window.addEventListener("keypress", (e) => {
             }
             break;
         default:
-            console.log(e.key)
+            console.log(e.key.toLowerCase())
             break;
     }
 
