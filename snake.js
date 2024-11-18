@@ -16,6 +16,9 @@ let applePos
 
 let alive = false
 let score
+let applesSinceSpawn
+let spawnRequirement =  Math.round((Math.random() * (7 - 3) + 3))
+
 
 let intervalID = 0
 
@@ -33,6 +36,7 @@ function theFunctionINeededThatPutsEverythingBackToNormalSoThatThePlayerCanStart
     alive = false
     
     score = 0
+    applesSinceSpawn = 0
     deathMessage.style = "opacity: 0"
 
     obstacles = [[]]
@@ -223,19 +227,18 @@ function collision() {
 }
 function spawnObstacle() {
     //console.log("attempting")
-    let obstacle = [
-        Math.round((Math.random() * (29 - 1) + 1)) * 30,
-        Math.round((Math.random() * (29 - 1) + 1)) * 30
-    ]
+    // let obstacle = [
+    //     Math.round((Math.random() * (29 - 1) + 1)) * 30,
+    //     Math.round((Math.random() * (29 - 1) + 1)) * 30
+    // ]
 
     let nonSpawnableBlocks = [[]]
+    let spawnableBlocks = [[]] 
 
     for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 3; j++) {
             nonSpawnableBlocks.push([body[0][0]+(i*30)],body[0][1]+(j*30))
         }
-        console.log(body[i])
-        console.log(nonSpawnableBlocks)
     }
 
     for (i in body) {
@@ -248,15 +251,37 @@ function spawnObstacle() {
 
     nonSpawnableBlocks.push(applePos)
 
-    for (i in nonSpawnableBlocks) {
-        if (listsAreEqual(nonSpawnableBlocks[i], obstacle) == true) {
-            console.log("failed spawn")
-            return false
+    // for (i in nonSpawnableBlocks) {
+    //     if (listsAreEqual(nonSpawnableBlocks[i], obstacle) == true) {
+    //         console.log("failed spawn")
+    //         return false
+    //     }
+    // }
+
+    for (let x = 0; x <= 900; x += 30) {
+        for (let y = 0; y <= 900; y += 30) {
+            spawnableBlocks.push([x,y])
+            for (i in nonSpawnableBlocks) {
+                if (listsAreEqual(nonSpawnableBlocks[i],[x,y]) == true) {
+                    
+                }
+            }
         }
     }
 
+    let obstacle = spawnableBlocks[Math.round((Math.random() * (spawnableBlocks.length - 1)))]
+    console.log(spawnableBlocks)
+    console.log(nonSpawnableBlocks)
     obstacles.push(obstacle)
-    //console.log(noSpawnZone)
+    
+    function itemInList(list, item) {s
+        for (i in list) {
+            if (listsAreEqual(list[i],item) == true) {
+                return true
+            } 
+        }
+        return false
+    }
 }
 function end() {
 
@@ -285,15 +310,22 @@ function frame(){
         elongate()
         apple = false
         applePos = [-30,-30]
+        //console.log(spawnRequirement, applesSinceSpawn)
+        
 
-        if (score != 0 && score % 3 == 0) {
-            for (let i = 0; i <= 10; i++) {
-                let success = false
-                while (success == false) {
-                    success = spawnObstacle()
-                }
+        if (applesSinceSpawn >= spawnRequirement) {
+            for (let i = 0; i <= 20; i++) {
+                // let success = false
+                // while (success == false) {
+                //     success = spawnObstacle()
+                // }
+                spawnObstacle()
             }
+            applesSinceSpawn = 0
+            spawnRequirement = Math.floor((Math.random() * (7 - 3) + 3))
         }
+
+        applesSinceSpawn++
 
     }
     
@@ -377,7 +409,7 @@ window.addEventListener("keydown", (e) => {
             }
             break;
         default:
-            console.log(e.key.toLowerCase())
+            //console.log(e.key.toLowerCase())
             break;
     }
 
