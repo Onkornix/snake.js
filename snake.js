@@ -96,9 +96,9 @@ function draw() {
         ctx.fillRect(obstacles[i][0],obstacles[i][1],30,30)
     }
 
-    ctx.fillStyle = "white"
-    ctx.font = "bold 46px Impact";
-    ctx.fillText(score,450,60)
+    // ctx.fillStyle = "white"
+    // ctx.font = "bold 46px Impact";
+    // ctx.fillText(score,450,60)
 }
 function elongate() {
     let end = body.length - 1
@@ -131,14 +131,20 @@ function elongate() {
     score++
 
 }
-function move() {
-    
+function move() {    
     let newPart
     let i = body.length - 1
     let bodyCopy = body
 
     if (dirChangeQueue.length >= 1) {
         let reqChange = dirChangeQueue.shift()
+
+        if ((reqChange == "up" && currentDirection == "down")
+        || (reqChange == "down" && currentDirection == "up")
+        || (reqChange == "left" && currentDirection == "right")
+        || (reqChange == "right" && currentDirection == "left")) {
+            return
+        }
         if (reqChange != currentDirection) {
             currentDirection = reqChange
         }
@@ -226,11 +232,6 @@ function collision() {
 
 }
 function spawnObstacle() {
-    //console.log("attempting")
-    // let obstacle = [
-    //     Math.round((Math.random() * (29 - 1) + 1)) * 30,
-    //     Math.round((Math.random() * (29 - 1) + 1)) * 30
-    // ]
 
     let nonSpawnableBlocks = [[]]
     let spawnableBlocks = [[]] 
@@ -251,20 +252,16 @@ function spawnObstacle() {
 
     nonSpawnableBlocks.push(applePos)
 
-    // for (i in nonSpawnableBlocks) {
-    //     if (listsAreEqual(nonSpawnableBlocks[i], obstacle) == true) {
-    //         console.log("failed spawn")
-    //         return false
-    //     }
-    // }
-
     for (let x = 0; x <= 900; x += 30) {
         for (let y = 0; y <= 900; y += 30) {
-            spawnableBlocks.push([x,y])
-            for (i in nonSpawnableBlocks) {
-                if (listsAreEqual(nonSpawnableBlocks[i],[x,y]) == true) {
-                    
-                }
+            let spawnable = true
+            if (nonSpawnableBlocks.find(
+                (element) => listsAreEqual(element, [x,y])
+            ) != undefined) {
+                spawnable = false
+            }
+            if (spawnable == true){
+                spawnableBlocks.push([x,y])
             }
         }
     }
@@ -273,15 +270,6 @@ function spawnObstacle() {
     console.log(spawnableBlocks)
     console.log(nonSpawnableBlocks)
     obstacles.push(obstacle)
-    
-    function itemInList(list, item) {s
-        for (i in list) {
-            if (listsAreEqual(list[i],item) == true) {
-                return true
-            } 
-        }
-        return false
-    }
 }
 function end() {
 
@@ -343,7 +331,6 @@ function frame(){
 
     draw()
 }
-
 function listsAreEqual(list1, list2) {
     if (list1[0] == list2[0] && list1[1] == list2[1]) {
         return true
@@ -414,4 +401,3 @@ window.addEventListener("keydown", (e) => {
     }
 
 })
-
