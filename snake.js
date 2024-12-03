@@ -95,10 +95,6 @@ function draw() {
     for (i in obstacles) {
         ctx.fillRect(obstacles[i][0],obstacles[i][1],30,30)
     }
-
-    // ctx.fillStyle = "white"
-    // ctx.font = "bold 46px Impact";
-    // ctx.fillText(score,450,60)
 }
 function elongate() {
     let end = body.length - 1
@@ -286,7 +282,7 @@ function end() {
       2000)
       deathMessage.style = "opacity: 1"
 }
-function frame(){
+function frame() {
 
     if (apple == false) {
         spawnApple()
